@@ -1,0 +1,25 @@
+version: 2.1
+
+setup: true
+
+orbs:
+  domino: cerebrotech/domino@0.0.6
+
+parameters:
+  # Used to update the CI runner from https://quay.io/repository/domino/circleci-workflow-builder?tab=tags
+  WORKFLOW_TEST:
+    type: string
+    # https://github.com/cerebrotech/circleci-workflow-builder
+    default: v0.0.4
+
+workflows:
+  setup:
+    jobs:
+      - domino/setup:
+          filters:
+            tags:
+              only: /^.*/
+          context:
+            - Quay Updater
+            - workflow
+          workflow-version: << pipeline.parameters.WORKFLOW_TEST >>
