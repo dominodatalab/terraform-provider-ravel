@@ -65,6 +65,7 @@ func (r *ConfigurationResource) Schema(ctx context.Context, req resource.SchemaR
 				MarkdownDescription: "Configuration identifier",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
+					stringplanmodifier.RequiresReplace(),
 				},
 			},
 			"version": schema.Int64Attribute{
@@ -89,6 +90,7 @@ func (r *ConfigurationResource) Schema(ctx context.Context, req resource.SchemaR
 				Optional:            true,
 				PlanModifiers: []planmodifier.Map{
 					mapplanmodifier.UseStateForUnknown(),
+					mapplanmodifier.RequiresReplace(),
 				},
 			},
 			"schema": schema.SingleNestedAttribute{
@@ -106,6 +108,9 @@ func (r *ConfigurationResource) Schema(ctx context.Context, req resource.SchemaR
 						MarkdownDescription: "Schema scope (Map<String, String>)",
 						ElementType:         types.StringType,
 						Optional:            true,
+						PlanModifiers: []planmodifier.Map{
+							mapplanmodifier.UseStateForUnknown(),
+						},
 					},
 				},
 			},
