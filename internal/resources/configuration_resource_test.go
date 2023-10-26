@@ -9,7 +9,6 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 )
 
@@ -102,9 +101,16 @@ func mockAPIHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	if r.Method == "GET" {
-		w.Write([]byte(getAPIResponse))
+		_, err := w.Write([]byte(getAPIResponse))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
 	} else if r.Method == "POST" {
-		w.Write([]byte(createAPIResponse))
+		_, err := w.Write([]byte(createAPIResponse))
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -112,8 +118,8 @@ func TestNewConfigurationResource(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(mockAPIHandler))
 	defer server.Close()
 
-	os.Setenv(provider.RavelToken, uuid.New().String())
-	os.Setenv(provider.RavelURL, server.URL)
+	t.Setenv(provider.RavelToken, uuid.New().String())
+	t.Setenv(provider.RavelURL, server.URL)
 
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,

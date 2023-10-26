@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -81,7 +80,7 @@ func (rc *RavelClient) handleError(res *resty.Response, err error) error {
 	}
 
 	if res.IsError() {
-		return errors.New(fmt.Sprintf("Error communicating with Ravel. URL: %s - %d. Response: %s", res.Request.URL, res.StatusCode(), string(res.Body())))
+		return fmt.Errorf("error communicating with Ravel. URL: %s - %d. Response: %s", res.Request.URL, res.StatusCode(), string(res.Body()))
 	}
 
 	return nil
