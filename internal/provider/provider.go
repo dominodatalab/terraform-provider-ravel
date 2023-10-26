@@ -5,7 +5,6 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/cerebrotech/terraform-provider-ravel/internal/client"
@@ -51,7 +50,7 @@ func (p RavelProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"url": schema.StringAttribute{
-				Description: fmt.Sprintf("Host URL for Ravel. Can be defined from env var RAVEL_URL"),
+				Description: "Host URL for Ravel. Can be defined from env var RAVEL_URL",
 				Optional:    true,
 			},
 			"token": schema.StringAttribute{
