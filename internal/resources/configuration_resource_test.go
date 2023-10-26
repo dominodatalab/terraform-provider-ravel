@@ -129,7 +129,6 @@ func TestNewConfigurationResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				ConfigDirectory: config.StaticDirectory(smtpConfigurationDirectory),
-				Destroy:         false,
 			},
 		},
 	})
