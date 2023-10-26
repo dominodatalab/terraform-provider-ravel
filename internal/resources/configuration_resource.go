@@ -116,6 +116,7 @@ func (r *ConfigurationResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"definition": schema.StringAttribute{
 				Required:            true,
+				Sensitive:           true,
 				MarkdownDescription: "Configuration definition",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -210,15 +211,8 @@ func (r *ConfigurationResource) Upsert(ctx context.Context, diagnostics *diag.Di
 		return
 	}
 
-	var createdDef []byte
-	createdDef, err = json.Marshal(createdConf.Spec.Def)
-	if err != nil {
-		return
-	}
-
 	data.Id = types.StringValue(createdConf.Id)
 	data.Version = types.Int64Value(createdConf.Meta.Version)
-	data.Definition = types.StringValue(string(createdDef))
 
 	tflog.Trace(ctx, fmt.Sprintf("upserted a configuration with id: %s and version: %d", createdConf.Id, createdConf.Meta.Version))
 
@@ -270,6 +264,8 @@ func (r *ConfigurationResource) Read(ctx context.Context, req resource.ReadReque
 
 		schema.Name = types.StringValue(configuration.Spec.ConfigurationFormat.Name)
 		schema.Version = types.StringValue(configuration.Spec.ConfigurationFormat.Version)
+
+		schema.Scope = data.Schema.Scope
 
 		data.Schema = &schema
 	}
