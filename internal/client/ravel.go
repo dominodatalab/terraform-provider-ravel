@@ -56,7 +56,7 @@ func (rc *RavelClient) GetConfigVersion(c context.Context, configId string, vers
 	res, err := rc.httpClient.R().SetContext(c).SetPathParams(map[string]string{
 		"configId": configId,
 		"version":  strconv.Itoa(version),
-	}).Get("/configurations/{configId}/versions/{version}")
+	}).Get("/configurations/{configId}/versions/{version}?secrets=resolve")
 
 	return rc.configProcess(res, err)
 }
