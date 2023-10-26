@@ -17,7 +17,7 @@ Example resource
 
 ### Required
 
-- `definition` (String) Configuration definition
+- `definition` (String, Sensitive) Configuration definition
 - `name` (String) Configuration name
 
 ### Optional
