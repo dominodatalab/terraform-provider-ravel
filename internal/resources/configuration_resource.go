@@ -249,23 +249,14 @@ func (r *ConfigurationResource) Read(ctx context.Context, req resource.ReadReque
 	}
 	data.Labels = labels
 
-	var scope map[string]types.String
-	if configuration.Meta.Scope != nil {
-		scope = make(map[string]types.String, len(configuration.Meta.Scope))
-
-		for key, val := range configuration.Meta.Scope {
-			scope[key] = types.StringValue(val)
-		}
-	}
-	data.Scope = scope
+	data.Scope = copyAndConvertMap(configuration.Meta.Scope)
 
 	if configuration.Spec.ConfigurationFormat != nil {
 		schema := ConfigurationSchemaModel{}
 
 		schema.Name = types.StringValue(configuration.Spec.ConfigurationFormat.Name)
 		schema.Version = types.StringValue(configuration.Spec.ConfigurationFormat.Version)
-
-		schema.Scope = data.Schema.Scope
+		schema.Scope = copyAndConvertMap(configuration.Spec.ConfigurationFormat.Scope)
 
 		data.Schema = &schema
 	}
@@ -303,4 +294,18 @@ func (r *ConfigurationResource) Delete(ctx context.Context, req resource.DeleteR
 
 func (r *ConfigurationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+}
+
+func copyAndConvertMap(src map[string]string) map[string]types.String {
+	if src == nil {
+		return nil
+	}
+
+	result := make(map[string]types.String, len(src))
+
+	for key, val := range src {
+		result[key] = types.StringValue(val)
+	}
+
+	return result
 }

@@ -5,6 +5,7 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/cerebrotech/terraform-provider-ravel/internal/client"
@@ -20,8 +21,8 @@ import (
 )
 
 const (
-	RavelToken = "RAVEL_TOKEN"
-	RavelURL   = "RAVEL_URL"
+	EnvRavelToken = "RAVEL_TOKEN"
+	EnvRavelURL   = "RAVEL_URL"
 )
 
 // Ensure RavelProvider satisfies various provider interfaces.
@@ -50,11 +51,11 @@ func (p RavelProvider) Schema(ctx context.Context, req provider.SchemaRequest, r
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"url": schema.StringAttribute{
-				Description: "Host URL for Ravel. Can be defined from env var RAVEL_URL",
+				Description: fmt.Sprintf("Host URL for Ravel. Can be defined from env var %s", EnvRavelURL),
 				Optional:    true,
 			},
 			"token": schema.StringAttribute{
-				Description: "The access token for API operations. Can be defined from env var RAVEL_TOKEN",
+				Description: fmt.Sprintf("The access token for API operations. Can be defined from env var %s", EnvRavelToken),
 				Optional:    true,
 				Sensitive:   true,
 			},
@@ -71,8 +72,8 @@ func (p RavelProvider) Configure(ctx context.Context, req provider.ConfigureRequ
 		return
 	}
 
-	token := os.Getenv(RavelToken)
-	url := os.Getenv(RavelURL)
+	token := os.Getenv(EnvRavelToken)
+	url := os.Getenv(EnvRavelURL)
 
 	if !config.Token.IsNull() {
 		token = config.Token.ValueString()

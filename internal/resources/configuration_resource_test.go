@@ -100,13 +100,13 @@ func mockAPIHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	if r.Method == "GET" {
+	if r.Method == http.MethodGet {
 		_, err := w.Write([]byte(getAPIResponse))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 
-	} else if r.Method == "POST" {
+	} else if r.Method == http.MethodPost {
 		_, err := w.Write([]byte(createAPIResponse))
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -118,8 +118,8 @@ func TestNewConfigurationResource(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(mockAPIHandler))
 	defer server.Close()
 
-	t.Setenv(provider.RavelToken, uuid.New().String())
-	t.Setenv(provider.RavelURL, server.URL)
+	t.Setenv(provider.EnvRavelToken, uuid.New().String())
+	t.Setenv(provider.EnvRavelURL, server.URL)
 
 	resource.Test(t, resource.TestCase{
 		IsUnitTest: true,
