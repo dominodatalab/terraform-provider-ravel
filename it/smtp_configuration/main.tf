@@ -1,4 +1,4 @@
-resource "ravel_configuration" "stmp_configuration" {
+resource "ravel_configuration" "smtp_configuration" {
   name = "domino-cloud-smtp-configuration-test"
 
   labels = {
