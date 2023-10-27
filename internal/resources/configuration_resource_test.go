@@ -1,18 +1,19 @@
 package resources_test
 
 import (
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/cerebrotech/terraform-provider-ravel/internal/provider"
 	"github.com/google/uuid"
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 	"github.com/hashicorp/terraform-plugin-go/tfprotov6"
 	"github.com/hashicorp/terraform-plugin-testing/config"
 	"github.com/hashicorp/terraform-plugin-testing/helper/resource"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
-const smtpConfigurationDirectory = "../../it/stmp_configuration"
+const smtpConfigurationDirectory = "../../it/smtp_configuration"
 
 var getAPIResponse = `{
     "id": "7eb918e0-49b6-4519-bb5a-850c42d8da04",
