@@ -116,6 +116,7 @@ func (r *ConfigurationResource) Schema(ctx context.Context, req resource.SchemaR
 			},
 			"definition": schema.StringAttribute{
 				Required:            true,
+				Sensitive:           true,
 				MarkdownDescription: "Configuration definition",
 				PlanModifiers: []planmodifier.String{
 					stringplanmodifier.UseStateForUnknown(),
@@ -210,15 +211,8 @@ func (r *ConfigurationResource) Upsert(ctx context.Context, diagnostics *diag.Di
 		return
 	}
 
-	var createdDef []byte
-	createdDef, err = json.Marshal(createdConf.Spec.Def)
-	if err != nil {
-		return
-	}
-
 	data.Id = types.StringValue(createdConf.Id)
 	data.Version = types.Int64Value(createdConf.Meta.Version)
-	data.Definition = types.StringValue(string(createdDef))
 
 	tflog.Trace(ctx, fmt.Sprintf("upserted a configuration with id: %s and version: %d", createdConf.Id, createdConf.Meta.Version))
 
@@ -255,21 +249,14 @@ func (r *ConfigurationResource) Read(ctx context.Context, req resource.ReadReque
 	}
 	data.Labels = labels
 
-	var scope map[string]types.String
-	if configuration.Meta.Scope != nil {
-		scope = make(map[string]types.String, len(configuration.Meta.Scope))
-
-		for key, val := range configuration.Meta.Scope {
-			scope[key] = types.StringValue(val)
-		}
-	}
-	data.Scope = scope
+	data.Scope = copyAndConvertMap(configuration.Meta.Scope)
 
 	if configuration.Spec.ConfigurationFormat != nil {
 		schema := ConfigurationSchemaModel{}
 
 		schema.Name = types.StringValue(configuration.Spec.ConfigurationFormat.Name)
 		schema.Version = types.StringValue(configuration.Spec.ConfigurationFormat.Version)
+		schema.Scope = copyAndConvertMap(configuration.Spec.ConfigurationFormat.Scope)
 
 		data.Schema = &schema
 	}
@@ -307,4 +294,18 @@ func (r *ConfigurationResource) Delete(ctx context.Context, req resource.DeleteR
 
 func (r *ConfigurationResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
 	resource.ImportStatePassthroughID(ctx, path.Root("id"), req, resp)
+}
+
+func copyAndConvertMap(src map[string]string) map[string]types.String {
+	if src == nil {
+		return nil
+	}
+
+	result := make(map[string]types.String, len(src))
+
+	for key, val := range src {
+		result[key] = types.StringValue(val)
+	}
+
+	return result
 }

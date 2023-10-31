@@ -20,6 +20,11 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
+const (
+	EnvRavelToken = "RAVEL_TOKEN"
+	EnvRavelURL   = "RAVEL_URL"
+)
+
 // Ensure RavelProvider satisfies various provider interfaces.
 var _ provider.Provider = &RavelProvider{}
 
@@ -37,20 +42,20 @@ type RavelProviderModel struct {
 	Token types.String `tfsdk:"token"`
 }
 
-func (p *RavelProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+func (p RavelProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "ravel"
 	resp.Version = p.version
 }
 
-func (p *RavelProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+func (p RavelProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"url": schema.StringAttribute{
-				Description: fmt.Sprintf("Host URL for Ravel. Can be defined from env var RAVEL_URL"),
+				Description: fmt.Sprintf("Host URL for Ravel. Can be defined from env var %s", EnvRavelURL),
 				Optional:    true,
 			},
 			"token": schema.StringAttribute{
-				Description: "The access token for API operations. Can be defined from env var RAVEL_TOKEN",
+				Description: fmt.Sprintf("The access token for API operations. Can be defined from env var %s", EnvRavelToken),
 				Optional:    true,
 				Sensitive:   true,
 			},
@@ -58,7 +63,7 @@ func (p *RavelProvider) Schema(ctx context.Context, req provider.SchemaRequest, 
 	}
 }
 
-func (p *RavelProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+func (p RavelProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
 	var config RavelProviderModel
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &config)...)
@@ -67,8 +72,8 @@ func (p *RavelProvider) Configure(ctx context.Context, req provider.ConfigureReq
 		return
 	}
 
-	token := os.Getenv("RAVEL_TOKEN")
-	url := os.Getenv("RAVEL_URL")
+	token := os.Getenv(EnvRavelToken)
+	url := os.Getenv(EnvRavelURL)
 
 	if !config.Token.IsNull() {
 		token = config.Token.ValueString()
@@ -109,13 +114,13 @@ func (p *RavelProvider) Configure(ctx context.Context, req provider.ConfigureReq
 	resp.ResourceData = ravelClient
 }
 
-func (p *RavelProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p RavelProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		resources.NewConfigurationResource,
 	}
 }
 
-func (p *RavelProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p RavelProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		data_sources.NewConfigurationDataSource,
 	}

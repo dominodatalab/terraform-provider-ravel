@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -57,7 +56,7 @@ func (rc *RavelClient) GetConfigVersion(c context.Context, configId string, vers
 	res, err := rc.httpClient.R().SetContext(c).SetPathParams(map[string]string{
 		"configId": configId,
 		"version":  strconv.Itoa(version),
-	}).Get("/configurations/{configId}/versions/{version}")
+	}).Get("/configurations/{configId}/versions/{version}?secrets=resolve")
 
 	return rc.configProcess(res, err)
 }
@@ -81,7 +80,7 @@ func (rc *RavelClient) handleError(res *resty.Response, err error) error {
 	}
 
 	if res.IsError() {
-		return errors.New(fmt.Sprintf("Error communicating with Ravel. URL: %s - %d. Response: %s", res.Request.URL, res.StatusCode(), string(res.Body())))
+		return fmt.Errorf("error communicating with Ravel. URL: %s - %d. Response: %s", res.Request.URL, res.StatusCode(), string(res.Body()))
 	}
 
 	return nil
